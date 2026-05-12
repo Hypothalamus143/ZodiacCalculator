@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    >
+
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center_horizontal"-->
+<!--        android:textSize="25sp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:textStyle="bold"/>-->
+
+<!--    <ImageView-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:src="@drawable/zodiac"-->
+<!--        android:layout_gravity="center_horizontal"-->
+<!--        android:layout_weight="2"-->
+<!--        />-->
+    <EditText
+        android:id="@+id/edittextTitle"
+        android:hint="Enter title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+    <Button
+        android:text="Add New Calculation"
+        android:id="@+id/buttonAddCalculation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your Calculations: "
+        android:textSize="25sp"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
+    <ListView
+        android:id="@+id/calculationsListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+<!--    <Button-->
+<!--        android:id="@+id/buttonProfile"-->
+<!--        android:layout_width="300dp"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:text="Profile"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:layout_weight="1"-->
+<!--        android:backgroundTint="@color/black"/>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textviewLogout"-->
+<!--        android:gravity="center_horizontal|center_vertical"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:text="Log Out"-->
+<!--        android:layout_weight="1"-->
+<!--        android:textColor="@color/black"-->
+<!--        android:textStyle="bold"/>-->
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center_horizontal"-->
+<!--        android:textSize="25sp"-->
+<!--        android:layout_weight="1"-->
+<!--        android:textStyle="bold"/>-->
+
+</LinearLayout>

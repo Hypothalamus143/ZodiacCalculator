@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="25sp"
+        android:layout_weight="1"
+        android:textStyle="bold"/>
+
+    <ImageView
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:src="@drawable/zodiac"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="5"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="Register"
+        android:textSize="25sp"
+        android:layout_weight="1"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/edittextUsername"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint = "Username"
+        android:layout_weight="1"
+        />
+
+    <EditText
+        android:id="@+id/edittextPassword"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint = "Password"
+        android:layout_weight="1"
+        />
+    <EditText
+        android:id="@+id/edittextConfirmPassword"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint = "Confirm Password"
+        android:layout_weight="1"
+        />
+    <Button
+        android:id="@+id/buttonCreateAccount"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:text="Create Account"
+        android:textColor="@color/white"
+        android:layout_weight="1"
+        android:backgroundTint="@color/black"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textSize="25sp"
+        android:layout_weight="1"
+        android:textStyle="bold"/>
+
+</LinearLayout>
