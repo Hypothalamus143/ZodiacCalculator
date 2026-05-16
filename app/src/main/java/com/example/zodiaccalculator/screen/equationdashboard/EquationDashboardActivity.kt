@@ -123,6 +123,9 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
+        variableView.setOnClickListener {
+            showEditVariableDialog(variable)
+        }
 
         return variableView
     }
