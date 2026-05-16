@@ -18,9 +18,6 @@ class DashboardPresenter(private val view: DashboardContract.View, private val m
     init {
        val calculations = model.getCalculations()
         if(calculations != null) view.setCalculationsListView(calculations)
-//        view.setUserDetails(view.getUsername()?: "", userdata?.get("firstname")?:"",  userdata?.get("middlename")?:"", userdata?.get("lastname")?:"")
     }
-//    override fun onDashboardClicked() {
-//        view.navigateToDashboard()
-//    }
+
 }
