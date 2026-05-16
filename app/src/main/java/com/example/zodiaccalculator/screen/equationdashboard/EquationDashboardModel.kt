@@ -1,10 +1,14 @@
 package com.example.zodiaccalculator.screen.equationdashboard
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.zodiaccalculator.app.ZodiacCalculator
 import com.example.zodiaccalculator.data.models.Variable
+import com.example.zodiaccalculator.data.repositories.UserRepository
 import com.example.zodiaccalculator.data.repositories.VariableRepository
+import kotlinx.coroutines.launch
 
-class EquationDashboardModel(private val app: ZodiacCalculator) {
+class EquationDashboardModel(private val app: ZodiacCalculator) : ViewModel(){
 
     fun getVariables(): List<Variable> = VariableRepository.getVariables()
 
@@ -96,8 +100,11 @@ class EquationDashboardModel(private val app: ZodiacCalculator) {
             val calculation = app.currentUser?.calculations?.find { it.id == calculationId }
             calculation?.let {
                 it.variables = variables.toList()  // Save a copy
-                it.dateModified = java.time.LocalDateTime.now()
+                it.dateModified = java.time.LocalDateTime.now().toString()
             }
+        }
+        viewModelScope.launch {
+            UserRepository.saveUser(app.currentUser!!);
         }
     }
 

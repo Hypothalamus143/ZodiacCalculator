@@ -12,6 +12,7 @@ class DashboardPresenter(private val view: DashboardContract.View, private val m
             return
         }
         model.addCalculation(title)
+        save();
         view.notifyChanges()
     }
 
@@ -25,5 +26,8 @@ class DashboardPresenter(private val view: DashboardContract.View, private val m
         // For example: app().clearUserSession()
         view.logout();
         // Navigate to LoginActivity
+    }
+    fun save(){
+        model.autoSave();
     }
 }

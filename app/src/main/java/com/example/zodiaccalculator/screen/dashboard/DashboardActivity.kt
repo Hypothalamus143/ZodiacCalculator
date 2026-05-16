@@ -1,7 +1,6 @@
 package com.example.zodiaccalculator.screen.dashboard
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -91,7 +90,9 @@ class DashboardActivity : Activity(), DashboardContract.View {
         startActivity(intent)
         finish()
     }
-
+    fun save(){
+        presenter.save();
+    }
     private fun updateItemCount(count: Int) {
         textviewItemCount.text = "$count item${if (count != 1) "s" else ""}"
     }

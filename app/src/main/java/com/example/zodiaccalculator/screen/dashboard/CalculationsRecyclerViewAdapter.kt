@@ -39,6 +39,7 @@ class CalculationsRecyclerViewAdapter(
 
         holder.buttonDeleteCalculation.setOnClickListener {
             calculationsList.removeAt(position)
+            (context as DashboardActivity).save();
             notifyItemRemoved(position)
             notifyItemRangeChanged(position, calculationsList.size - position)
         }

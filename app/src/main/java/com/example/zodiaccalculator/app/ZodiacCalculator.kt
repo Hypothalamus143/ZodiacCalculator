@@ -3,6 +3,7 @@ package com.example.zodiaccalculator.app
 import android.app.Application
 import android.util.Log
 import com.example.zodiaccalculator.data.models.User
+import com.example.zodiaccalculator.data.repositories.UserRepository
 
 class ZodiacCalculator : Application() {
     var currentUser: User? = null;
@@ -20,5 +21,6 @@ class ZodiacCalculator : Application() {
         super.onCreate()
         instance = this
         Log.e("Custom App", "is running")
+        UserRepository.initialize(this)
     }
 }
