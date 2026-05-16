@@ -5,5 +5,7 @@ data class Variable(
     var name: String,
     var expression: String,
     var value: Double? = null,
-    var isValid: Boolean = true
+    var symbolicValue: String? = null,  // NEW: Store symbolic representation
+    var isValid: Boolean = true,
+    var hasUndefinedVariables: Boolean = false
 )

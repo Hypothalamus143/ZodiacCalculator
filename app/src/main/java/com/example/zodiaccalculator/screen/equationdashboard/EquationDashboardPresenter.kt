@@ -104,4 +104,18 @@ class EquationDashboardPresenter(
         view.displayVariables(variables)
         view.refreshVariables()
     }
+    override fun getCurrentVariableValues(): Map<String, Double> {
+        return model.getCurrentVariableValues()
+    }
+    fun getSymbolicExpression(variableId: String): String {
+        return model.getSymbolicExpression(variableId)
+    }
+
+    fun getUndefinedVariables(variableId: String): List<String> {
+        return model.getUndefinedVariables(variableId)
+    }
+
+    fun isFullyEvaluated(variableId: String): Boolean {
+        return model.isFullyEvaluated(variableId)
+    }
 }

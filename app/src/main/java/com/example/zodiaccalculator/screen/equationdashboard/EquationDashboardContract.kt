@@ -20,5 +20,6 @@ class EquationDashboardContract {
         fun onVariableDeleted(variableId: String)
         fun onVariableExpressionChanged(variableId: String, newExpression: String)
         fun onVariableNameChanged(variableId: String, newName: String)
+        fun getCurrentVariableValues(): Map<String, Double>  // ADD THIS
     }
 }

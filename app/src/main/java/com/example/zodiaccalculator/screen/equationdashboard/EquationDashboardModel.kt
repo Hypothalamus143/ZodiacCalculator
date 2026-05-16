@@ -54,4 +54,18 @@ class EquationDashboardModel {
             false
         }
     }
+    fun getCurrentVariableValues(): Map<String, Double> {
+        return VariableRepository.getCurrentVariableValues()
+    }
+    fun getSymbolicExpression(variableId: String): String {
+        return VariableRepository.getSymbolicExpression(variableId)
+    }
+
+    fun getUndefinedVariables(variableId: String): List<String> {
+        return VariableRepository.getUndefinedVariables(variableId)
+    }
+
+    fun isFullyEvaluated(variableId: String): Boolean {
+        return VariableRepository.isFullyEvaluated(variableId)
+    }
 }

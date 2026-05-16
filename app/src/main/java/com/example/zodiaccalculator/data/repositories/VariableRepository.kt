@@ -68,14 +68,24 @@ object VariableRepository {
             val variable = variables[variableId]
             if (variable != null) {
                 val variableMap = buildVariableMap()
+
+                // Try numeric evaluation
                 val result = evaluator.evaluate(variable.expression, variableMap)
 
                 if (result != null) {
                     variable.value = result
+                    variable.symbolicValue = result.toString()
                     variable.isValid = true
+                    variable.hasUndefinedVariables = false
                 } else {
                     variable.value = null
                     variable.isValid = false
+                    // Store symbolic representation
+                    variable.symbolicValue = evaluator.getSymbolicExpression(variable.expression, variableMap)
+                    variable.hasUndefinedVariables = evaluator.getUndefinedVariables(
+                        variable.expression,
+                        variables.values.map { it.name }.toSet()
+                    ).isNotEmpty()
                 }
             }
         } finally {
@@ -154,5 +164,47 @@ object VariableRepository {
         saveVariable(null, "sum", "x + y")
         saveVariable(null, "product", "x * y")
         saveVariable(null, "quadratic", "sum^2 + product")
+    }
+    // Add to VariableRepository.kt
+
+    fun getSymbolicValue(variableId: String): String {
+        val variable = variables[variableId] ?: return "?"
+
+        // Get current values of all variables
+        val currentValues = getCurrentVariableValues()
+
+        // Try to evaluate fully first
+        val numericResult = evaluator.evaluate(variable.expression, currentValues)
+
+        return if (numericResult != null) {
+            numericResult.toString()  // Fully evaluable - show number
+        } else {
+            // Get symbolic representation
+            evaluator.getSymbolicExpression(variable.expression, currentValues)
+        }
+    }
+
+    fun hasUndefinedVariables(variableId: String): Boolean {
+        val variable = variables[variableId] ?: return true
+        val definedVariables = variables.values.map { it.name }.toSet()
+        val undefined = evaluator.getUndefinedVariables(variable.expression, definedVariables)
+        return undefined.isNotEmpty()
+    }
+    fun getSymbolicExpression(variableId: String): String {
+        val variable = variables[variableId] ?: return "?"
+        val currentValues = getCurrentVariableValues()
+        return evaluator.getSymbolicExpression(variable.expression, currentValues)
+    }
+
+    fun getUndefinedVariables(variableId: String): List<String> {
+        val variable = variables[variableId] ?: return emptyList()
+        val definedVariables = variables.values.map { it.name }.toSet()
+        return evaluator.getUndefinedVariables(variable.expression, definedVariables)
+    }
+
+    fun isFullyEvaluated(variableId: String): Boolean {
+        val variable = variables[variableId] ?: return false
+        val currentValues = getCurrentVariableValues()
+        return evaluator.evaluate(variable.expression, currentValues) != null
     }
 }

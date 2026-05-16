@@ -4,59 +4,76 @@ import net.objecthunter.exp4j.ExpressionBuilder
 
 class ExpressionEvaluator {
 
+    // Regular evaluation - returns null if can't evaluate
     fun evaluate(expression: String, variables: Map<String, Double>): Double? {
         return try {
-            // Build the expression with all variable names
             val builder = ExpressionBuilder(expression)
 
-            // Add all variable names that appear in the expression
+            // Add each variable individually
             variables.keys.forEach { varName ->
                 if (expression.contains(varName)) {
                     builder.variable(varName)
                 }
             }
 
-            // Build the expression
             val expr = builder.build()
 
-            // Set the variable values
+            // Set variable values
             variables.forEach { (name, value) ->
                 if (expression.contains(name)) {
                     expr.setVariable(name, value)
                 }
             }
 
-            // Evaluate and return result
             expr.evaluate()
-
         } catch (e: Exception) {
-            e.printStackTrace()
             null
         }
     }
 
-    // For display - shows expression with current values substituted
-    fun getExpressionWithValues(expression: String, variables: Map<String, Double>): String {
+    // Symbolic evaluation - substitute known values, leave unknowns as symbols
+    fun getSymbolicExpression(expression: String, variables: Map<String, Double>): String {
         var result = expression
-        variables.forEach { (name, value) ->
-            result = result.replace(name, value.toString())
+
+        // Sort by name length (longest first) to avoid partial replacements
+        val sortedVariables = variables.entries.sortedByDescending { it.key.length }
+
+        sortedVariables.forEach { (name, value) ->
+            // Replace variable names with their values using word boundaries
+            val regex = Regex("\\b$name\\b")
+            result = result.replace(regex, value.toString())
         }
+
         return result
     }
 
-    // Validate if an expression is syntactically correct
-    fun isValidExpression(expression: String, availableVariables: List<String>): Boolean {
+    // Check if expression is fully evaluable
+    fun isFullyEvaluable(expression: String, variables: Map<String, Double>): Boolean {
         return try {
-            val builder = ExpressionBuilder(expression)
-            availableVariables.forEach { varName ->
-                if (expression.contains(varName)) {
-                    builder.variable(varName)
-                }
-            }
-            builder.build()
-            true
+            evaluate(expression, variables) != null
         } catch (e: Exception) {
             false
         }
+    }
+
+    // Get list of undefined variables in expression
+    fun getUndefinedVariables(expression: String, definedVariables: Set<String>): List<String> {
+        val undefined = mutableSetOf<String>()
+        // Regex to find variable names (letters and numbers, starting with letter)
+        val regex = Regex("[a-zA-Z][a-zA-Z0-9]*")
+        val matches = regex.findAll(expression)
+
+        matches.forEach { match ->
+            val varName = match.value
+            if (!definedVariables.contains(varName) && !isNumeric(varName)) {
+                undefined.add(varName)
+            }
+        }
+
+        return undefined.toList()
+    }
+
+    private fun isNumeric(str: String): Boolean {
+        return str.toDoubleOrNull() != null
     }
 }

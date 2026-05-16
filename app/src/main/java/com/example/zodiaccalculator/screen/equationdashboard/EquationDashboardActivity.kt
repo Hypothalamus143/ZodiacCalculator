@@ -49,13 +49,34 @@ class EquationDashboardActivity : AppCompatActivity(), EquationDashboardContract
         editVariableName.setText(variable.name)
         editVariableExpression.setText(variable.expression)
 
-        val resultText = if (variable.value != null && variable.isValid) {
-            "= ${variable.value}"
-        } else {
-            "= Invalid Expression"
+        // Get evaluation info from presenter
+        val isFullyEvaluated = presenter.isFullyEvaluated(variable.id)
+        val symbolicValue = presenter.getSymbolicExpression(variable.id)
+        val undefinedVariables = presenter.getUndefinedVariables(variable.id)
+
+        val resultText = when {
+            isFullyEvaluated -> {
+                "= ${variable.value}"
+            }
+            symbolicValue != variable.expression -> {
+                "≈ $symbolicValue"
+            }
+            undefinedVariables.isNotEmpty() -> {
+                "= ${variable.expression} (missing: ${undefinedVariables.joinToString(", ")})"
+            }
+            else -> {
+                "= ${variable.expression}"
+            }
         }
+
         textResult.text = resultText
-        textResult.setTextColor(if (variable.isValid) Color.parseColor("#4CAF50") else Color.RED)
+
+        // Color coding
+        when {
+            isFullyEvaluated -> textResult.setTextColor(Color.parseColor("#4CAF50"))  // Green
+            symbolicValue != variable.expression -> textResult.setTextColor(Color.parseColor("#FF9800"))  // Orange
+            else -> textResult.setTextColor(Color.RED)  // Red
+        }
 
         editVariableName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
@@ -116,7 +137,6 @@ class EquationDashboardActivity : AppCompatActivity(), EquationDashboardContract
             .setNegativeButton("Cancel", null)
             .show()
     }
-
     override fun showError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
