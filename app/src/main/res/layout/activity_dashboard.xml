@@ -4,48 +4,45 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@color/white">
 
     <!-- Top App Bar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/purple_500"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@color/white"
         app:title="Dashboard"
-        app:titleTextColor="@android:color/white" />
+        app:titleTextColor="@color/black"
+        android:elevation="0dp" />
 
-    <!-- Content -->
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_200" />
+
+    <!-- Main Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Add Button -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/buttonAddCalculation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:src="@android:drawable/ic_input_add"
-            android:backgroundTint="@color/purple_500"
-            android:layout_marginBottom="16dp" />
-
-        <!-- Calculations Section Header -->
+        <!-- Header Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Your Calculations"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/black" />
 
@@ -54,31 +51,51 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 items"
-                android:textSize="14sp"
-                android:textColor="@color/gray" />
+                android:textSize="13sp"
+                android:textColor="@color/gray_500"
+                android:layout_marginEnd="12dp" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/buttonAddCalculation"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_add"
+                android:backgroundTint="@color/black"
+                app:tint="@color/white"
+                app:elevation="0dp"
+                app:borderWidth="0dp"
+                android:clickable="true"
+                android:focusable="true" />
+
         </LinearLayout>
 
-        <!-- RecyclerView -->
+        <!-- RecyclerView - Fixed layout parameters -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/calculationsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:scrollbars="vertical" />
+            android:scrollbars="vertical"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
 
         <!-- Logout Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonLogout"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="48dp"
             android:text="Logout"
             android:textAllCaps="false"
-            android:textSize="16sp"
-            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            android:textSize="14sp"
+            android:textColor="@color/gray_700"
+            app:icon="@drawable/ic_logout"
             app:iconGravity="textStart"
-            android:backgroundTint="@color/red"
+            app:iconTint="@color/gray_700"
+            android:backgroundTint="@android:color/transparent"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true" />
 
     </LinearLayout>
 </LinearLayout>

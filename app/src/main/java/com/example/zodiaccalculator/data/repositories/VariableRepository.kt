@@ -53,9 +53,9 @@ object VariableRepository {
     fun deleteVariable(id: String): Boolean {
         // Check if other variables depend on this one
         val dependents = findDependents(id)
-        if (dependents.isNotEmpty()) {
-            throw IllegalStateException("Cannot delete '${variables[id]?.name}': ${dependents.size} other variable(s) depend on it")
-        }
+//        if (dependents.isNotEmpty()) {
+//            throw IllegalStateException("Cannot delete '${variables[id]?.name}': ${dependents.size} other variable(s) depend on it")
+//        }
         return variables.remove(id) != null
     }
 

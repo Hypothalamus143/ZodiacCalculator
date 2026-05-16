@@ -5,7 +5,6 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.zodiaccalculator.R
@@ -23,7 +22,7 @@ class CalculationsRecyclerViewAdapter(
         val title: TextView = itemView.findViewById(R.id.textviewTitle)
         val dateCreated: TextView = itemView.findViewById(R.id.textviewDateCreated)
         val dateModified: TextView = itemView.findViewById(R.id.textviewDateModified)
-        val buttonDeleteCalculation: Button = itemView.findViewById(R.id.buttonDeleteCalculation)
+        val textviewDeleteCalculation: TextView = itemView.findViewById(R.id.textviewDeleteCalculation)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CalculationViewHolder {
@@ -37,7 +36,7 @@ class CalculationsRecyclerViewAdapter(
         holder.dateCreated.text = calculation.dateCreated.toString()
         holder.dateModified.text = calculation.dateModified.toString()
 
-        holder.buttonDeleteCalculation.setOnClickListener {
+        holder.textviewDeleteCalculation.setOnClickListener {
             calculationsList.removeAt(position)
             (context as DashboardActivity).save();
             notifyItemRemoved(position)

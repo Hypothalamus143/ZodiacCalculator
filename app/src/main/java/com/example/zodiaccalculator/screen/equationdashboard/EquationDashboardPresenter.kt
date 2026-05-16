@@ -135,4 +135,7 @@ class EquationDashboardPresenter(
     fun isFullyEvaluated(variableId: String): Boolean {
         return model.isFullyEvaluated(variableId)
     }
+    override fun logoClicked(){
+        view.navigateToDashboard();
+    }
 }

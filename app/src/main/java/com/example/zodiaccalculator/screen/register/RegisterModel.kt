@@ -5,13 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.zodiaccalculator.app.ZodiacCalculator
 import com.example.zodiaccalculator.data.repositories.UserRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class RegisterModel(private val app : ZodiacCalculator) : ViewModel(){
     fun register(username: String, password : String) : Boolean{
-        viewModelScope.launch {
+        return runBlocking {
             val success = UserRepository.register(username, password)
-            if(success) app.currentUser = UserRepository.getUserData(username)
+            success
         }
-        return app.currentUser != null
+    }
+    fun deleteAllUsers(){
+        return runBlocking {  UserRepository.deleteAllUserData()}
     }
 }

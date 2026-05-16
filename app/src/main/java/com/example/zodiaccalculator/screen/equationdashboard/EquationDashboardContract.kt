@@ -10,6 +10,7 @@ class EquationDashboardContract {
         fun showError(message: String)
         fun showSuccess(message: String)
         fun refreshVariables()
+        fun navigateToDashboard()
     }
 
     interface Presenter {
@@ -21,5 +22,6 @@ class EquationDashboardContract {
         fun onVariableExpressionChanged(variableId: String, newExpression: String)
         fun onVariableNameChanged(variableId: String, newName: String)
         fun getCurrentVariableValues(): Map<String, Double>  // ADD THIS
+        fun logoClicked()
     }
 }

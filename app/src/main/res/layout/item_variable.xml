@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/gray_200"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <!-- Header with name and expression -->
         <LinearLayout
@@ -20,49 +22,75 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <EditText
-                android:id="@+id/editVariableName"
-                android:layout_width="100dp"
-                android:layout_height="48dp"
+            <TextView
+                android:id="@+id/textVariableName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="x"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textAlignment="center"
-                android:background="@android:drawable/editbox_background"
-                android:inputType="text"
-                android:padding="8dp"
-                android:layout_marginEnd="8dp"
-                android:hint="name" />
+                android:textColor="@color/black"
+                android:minWidth="60dp"
+                android:layout_marginEnd="12dp" />
 
-            <EditText
-                android:id="@+id/editVariableExpression"
+            <TextView
+                android:id="@+id/textVariableExpression"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="expression (e.g., 5, x + y, x * 2)"
-                android:inputType="text"
-                android:background="@android:drawable/editbox_background"
-                android:padding="8dp"
-                android:layout_marginEnd="8dp" />
+                android:text="5 + 3"
+                android:textSize="14sp"
+                android:textColor="@color/gray_700"
+                android:fontFamily="monospace" />
 
-            <ImageButton
-                android:id="@+id/buttonDeleteVariable"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_delete"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="12dp"
-                android:contentDescription="Delete Variable" />
+            <TextView
+                android:id="@+id/textviewDeleteVariable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:textSize="13sp"
+                android:textColor="@color/gray_500"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
         </LinearLayout>
 
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray_200"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp" />
+
         <!-- Result display -->
-        <TextView
-            android:id="@+id/textVariableResult"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Result: "
-            android:textSize="14sp"
-            android:padding="4dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Result: "
+                android:textSize="13sp"
+                android:textColor="@color/gray_400" />
+
+            <TextView
+                android:id="@+id/textVariableResult"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0.0"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.example.zodiaccalculator.R
 import com.example.zodiaccalculator.screen.login.LoginActivity
@@ -17,6 +19,8 @@ class RegisterActivity : Activity(), RegisterContract.View{
     private lateinit var edittextUsername : EditText
     private lateinit var edittextPassword : EditText
     private lateinit var edittextConfirmPassword : EditText
+    private lateinit var textviewSignInInstead : TextView
+    private lateinit var imageDelete : ImageView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -25,8 +29,16 @@ class RegisterActivity : Activity(), RegisterContract.View{
         edittextPassword = findViewById<EditText>(R.id.edittextPassword)
         edittextConfirmPassword = findViewById<EditText>(R.id.edittextConfirmPassword)
         buttonCreateAccount = findViewById<Button>(R.id.buttonCreateAccount)
+        textviewSignInInstead = findViewById<TextView>(R.id.textviewSignInInstead)
+        imageDelete = findViewById<ImageView>(R.id.imageViewLogo)
         buttonCreateAccount.setOnClickListener(){
             presenter.onRegisterClicked(edittextUsername.text.toString(), edittextPassword.text.toString(), edittextConfirmPassword.text.toString())
+        }
+        textviewSignInInstead.setOnClickListener {
+            presenter.onLoginClicked()
+        }
+        imageDelete.setOnClickListener {
+            presenter.onLogoClicked();
         }
     }
 

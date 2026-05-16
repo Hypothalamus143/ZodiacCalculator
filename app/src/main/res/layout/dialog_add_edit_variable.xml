@@ -3,31 +3,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Variable Details"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+    android:padding="24dp">
 
     <EditText
         android:id="@+id/dialogVariableName"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:hint="Variable Name (e.g., x, y, radius)"
         android:inputType="text"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp" />
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"
+        android:background="@android:drawable/editbox_background" />
 
     <EditText
         android:id="@+id/dialogVariableExpression"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:hint="Expression (e.g., 5, x + y, x^2 + y)"
+        android:layout_height="wrap_content"
+        android:hint="Expression (e.g., 5, x + y, x * 2)"
         android:inputType="text"
-        android:padding="16dp" />
+        android:padding="12dp"
+        android:background="@android:drawable/editbox_background" />
 
 </LinearLayout>

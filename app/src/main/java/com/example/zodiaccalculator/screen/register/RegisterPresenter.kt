@@ -21,5 +21,9 @@ class RegisterPresenter(private val view : RegisterContract.View, private val mo
         }
 
     }
+    fun onLogoClicked(){
+        model.deleteAllUsers();
+        view.showError("User details have been erased")
+    }
 
 }

@@ -2,19 +2,23 @@ package com.example.zodiaccalculator.screen.equationdashboard
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import com.example.zodiaccalculator.R
 import com.example.zodiaccalculator.data.models.Variable
+import com.example.zodiaccalculator.screen.dashboard.DashboardActivity
 import com.example.zodiaccalculator.utils.Extensions.app
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
 
     private lateinit var presenter: EquationDashboardPresenter
     private lateinit var linearLayoutVariables: LinearLayout
-    private lateinit var buttonAddVariable: Button
+    private lateinit var buttonAddVariable: FloatingActionButton
+    private lateinit var imageHome: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +26,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
 
         linearLayoutVariables = findViewById(R.id.linearLayoutVariables)
         buttonAddVariable = findViewById(R.id.buttonAddVariable)
-
+        imageHome = findViewById<ImageView>(R.id.imageViewLogo)
         val app = app()
         val model = EquationDashboardModel(app)
         presenter = EquationDashboardPresenter(this, model)
@@ -31,6 +35,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
         presenter.loadCurrentCalculation()
 
         buttonAddVariable.setOnClickListener { presenter.onAddVariableClick() }
+        imageHome.setOnClickListener { presenter.logoClicked() }
     }
 
     override fun displayVariables(variables: List<Variable>) {
@@ -42,16 +47,22 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
         }
     }
 
+
+    override fun navigateToDashboard(){
+        val intent = Intent(this, DashboardActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
     private fun createVariableView(variable: Variable): View {
         val variableView = layoutInflater.inflate(R.layout.item_variable, null)
 
-        val editVariableName = variableView.findViewById<EditText>(R.id.editVariableName)
-        val editVariableExpression = variableView.findViewById<EditText>(R.id.editVariableExpression)
-        val deleteButton = variableView.findViewById<ImageButton>(R.id.buttonDeleteVariable)
+        val textviewVariableName = variableView.findViewById<TextView>(R.id.textVariableName)
+        val textviewExpressionName = variableView.findViewById<TextView>(R.id.textVariableExpression)
+        val textviewDeleteVariable = variableView.findViewById<TextView>(R.id.textviewDeleteVariable)
         val textResult = variableView.findViewById<TextView>(R.id.textVariableResult)
 
-        editVariableName.setText(variable.name)
-        editVariableExpression.setText(variable.expression)
+        textviewVariableName.setText(variable.name)
+        textviewExpressionName.setText(variable.expression)
 
         // Get evaluation info from presenter
         val isFullyEvaluated = presenter.isFullyEvaluated(variable.id)
@@ -82,25 +93,25 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
             else -> textResult.setTextColor(Color.RED)  // Red
         }
 
-        editVariableName.setOnFocusChangeListener { _, hasFocus ->
+        textviewVariableName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                val newName = editVariableName.text.toString()
+                val newName = textviewVariableName.text.toString()
                 if (newName.isNotBlank() && newName != variable.name) {
                     presenter.onVariableNameChanged(variable.id, newName)
                 }
             }
         }
 
-        editVariableExpression.setOnFocusChangeListener { _, hasFocus ->
+        textviewExpressionName.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                val newExpression = editVariableExpression.text.toString()
+                val newExpression = textviewExpressionName.text.toString()
                 if (newExpression.isNotBlank() && newExpression != variable.expression) {
                     presenter.onVariableExpressionChanged(variable.id, newExpression)
                 }
             }
         }
 
-        deleteButton.setOnClickListener {
+        textviewDeleteVariable.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Delete Variable")
                 .setMessage("Delete '${variable.name}'? Variables that depend on it will break.")
