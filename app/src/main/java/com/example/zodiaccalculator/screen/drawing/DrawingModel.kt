@@ -1,6 +1,7 @@
 package com.example.zodiaccalculator.screen.drawing
 
 import com.example.zodiaccalculator.app.ZodiacCalculator
+import com.example.zodiaccalculator.data.models.Stroke
 import com.example.zodiaccalculator.data.repositories.StrokeRepository
 
 class DrawingModel(private val app: ZodiacCalculator) {
@@ -9,7 +10,7 @@ class DrawingModel(private val app: ZodiacCalculator) {
         return StrokeRepository.getStrokeCount()
     }
 
-    fun getAllStrokes(): List<StrokeRepository.Stroke> {
+    fun getAllStrokes(): List<Stroke> {
         return StrokeRepository.getAllStrokes()
     }
 

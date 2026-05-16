@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import com.example.zodiaccalculator.data.models.Point
+import com.example.zodiaccalculator.data.models.Stroke
 import com.example.zodiaccalculator.data.repositories.StrokeRepository
 import java.util.*
 
@@ -15,11 +17,7 @@ class DrawingView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), StrokeRepository.StrokeObserver {
 
-    // Drawing variables
-    private var currentPath: Path? = null
-    private var currentPaint: Paint? = null
-    private var currentStrokeId: String? = null
-
+    private var currentPoints = mutableListOf<Point>()
     private val strokeColor = Color.BLACK
     private val strokeWidth = 20f
     private var currentTool = Tool.PEN
@@ -28,33 +26,35 @@ class DrawingView @JvmOverloads constructor(
         PEN, ERASER, HAND
     }
 
-    // Canvas and bitmap for persistence (stores at original scale, no transformations)
     private var canvasBitmap: Bitmap? = null
     private var canvasPaint: Paint? = null
 
-    // Pan & Zoom variables
-    private var scaleFactor = 1f
-    private var minScale = 0.5f
-    private var maxScale = 3f
-    private var translateX = 0f
-    private var translateY = 0f
+    // Track the drawing offset and scale separately from view transform
+    private var canvasOffsetX = 0f
+    private var canvasOffsetY = 0f
+    private var canvasScale = 1f
 
     // Touch handling for pan
     private var lastTouchX = 0f
     private var lastTouchY = 0f
     private var activePointerId = -1
 
-    // Gesture detectors
     private lateinit var scaleGestureDetector: ScaleGestureDetector
 
-    // For continuous erasing (in canvas coordinates)
+    // For continuous erasing
     private var lastEraseX = 0f
     private var lastEraseY = 0f
     private var isErasing = false
 
-    // Matrix for converting screen coordinates to canvas coordinates
-    private val transformMatrix = Matrix()
-    private val inverseMatrix = Matrix()
+    private val tempPaint = Paint().apply {
+        isAntiAlias = true
+        isDither = true
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = strokeWidth
+        color = strokeColor
+    }
 
     init {
         setupDrawing()
@@ -69,9 +69,21 @@ class DrawingView @JvmOverloads constructor(
     private fun setupGestures() {
         scaleGestureDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
-                scaleFactor *= detector.scaleFactor
-                scaleFactor = scaleFactor.coerceIn(minScale, maxScale)
-                invalidate()
+                // Scale relative to the gesture focal point
+                val prevScale = canvasScale
+                val newScale = (canvasScale * detector.scaleFactor).coerceIn(0.5f, 3f)
+
+                if (newScale != prevScale) {
+                    val focalX = detector.focusX
+                    val focalY = detector.focusY
+
+                    // Adjust offset to keep focal point stationary
+                    canvasOffsetX = (canvasOffsetX - focalX) * (newScale / prevScale) + focalX
+                    canvasOffsetY = (canvasOffsetY - focalY) * (newScale / prevScale) + focalY
+                    canvasScale = newScale
+
+                    invalidate()
+                }
                 return true
             }
 
@@ -91,36 +103,29 @@ class DrawingView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // Save the canvas state
         canvas.save()
+        // Apply the canvas transformation for viewing
+        canvas.translate(canvasOffsetX, canvasOffsetY)
+        canvas.scale(canvasScale, canvasScale)
 
-        // Apply transformations for view only (doesn't affect stored bitmap)
-        canvas.translate(translateX, translateY)
-        canvas.scale(scaleFactor, scaleFactor)
-
-        // Draw the bitmap (which is already at original scale)
+        // Draw the bitmap (which is at 1:1 scale with canvas coordinates)
         canvasBitmap?.let { bitmap ->
             canvas.drawBitmap(bitmap, 0f, 0f, canvasPaint)
         }
 
-        // Draw current stroke while drawing (also transformed)
-        currentPath?.let { path ->
-            currentPaint?.let { paint ->
-                canvas.drawPath(path, paint)
-            }
+        // Draw current stroke
+        if (currentPoints.size > 1 && currentTool == Tool.PEN) {
+            val path = pointsToPath(currentPoints)
+            canvas.drawPath(path, tempPaint)
         }
 
         canvas.restore()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        // Handle scale gesture first
         scaleGestureDetector.onTouchEvent(event)
 
-        // Update matrices for coordinate conversion
-        updateMatrices()
-
-        // Convert screen coordinates to canvas coordinates (where strokes actually live)
+        // Convert screen coordinates to canvas coordinates
         val canvasPoint = screenToCanvas(event.x, event.y)
 
         when (currentTool) {
@@ -135,30 +140,28 @@ class DrawingView @JvmOverloads constructor(
     private fun handlePenTool(event: MotionEvent, canvasPoint: PointF) {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                startNewStroke(canvasPoint.x, canvasPoint.y)
+                currentPoints.clear()
+                currentPoints.add(Point(canvasPoint.x, canvasPoint.y))
+                invalidate()
             }
 
             MotionEvent.ACTION_MOVE -> {
-                currentPath?.lineTo(canvasPoint.x, canvasPoint.y)
+                currentPoints.add(Point(canvasPoint.x, canvasPoint.y))
                 invalidate()
             }
 
             MotionEvent.ACTION_UP -> {
-                if (currentPath != null && currentPaint != null && currentStrokeId != null) {
-                    val stroke = StrokeRepository.Stroke(
-                        id = currentStrokeId!!,
-                        path = currentPath!!,
-                        paint = currentPaint!!,
-                        strokeWidth = strokeWidth
+                if (currentPoints.size > 1) {
+                    val stroke = Stroke(
+                        strokeWidth = strokeWidth,
+                        color = strokeColor,
+                        points = currentPoints.toList()
                     )
                     StrokeRepository.addStroke(stroke)
                     drawStrokeToBitmap(stroke)
-
-                    currentPath = null
-                    currentPaint = null
-                    currentStrokeId = null
-                    invalidate()
                 }
+                currentPoints.clear()
+                invalidate()
             }
         }
     }
@@ -202,14 +205,8 @@ class DrawingView @JvmOverloads constructor(
                     val dx = event.getX(pointerIndex) - lastTouchX
                     val dy = event.getY(pointerIndex) - lastTouchY
 
-                    translateX += dx
-                    translateY += dy
-
-                    // Optional bounds to prevent panning too far
-                    val maxPanX = width * (scaleFactor - 1) / 2
-                    val maxPanY = height * (scaleFactor - 1) / 2
-                    translateX = translateX.coerceIn(-maxPanX, maxPanX)
-                    translateY = translateY.coerceIn(-maxPanY, maxPanY)
+                    canvasOffsetX += dx
+                    canvasOffsetY += dy
 
                     lastTouchX = event.getX(pointerIndex)
                     lastTouchY = event.getY(pointerIndex)
@@ -223,44 +220,32 @@ class DrawingView @JvmOverloads constructor(
         }
     }
 
-    private fun startNewStroke(x: Float, y: Float) {
-        currentPath = Path()
-        currentPath?.moveTo(x, y)
-        currentPath?.lineTo(x, y)
-
-        currentPaint = Paint().apply {
-            isAntiAlias = true
-            isDither = true
-            style = Paint.Style.STROKE
-            strokeJoin = Paint.Join.ROUND
-            strokeCap = Paint.Cap.ROUND
-            strokeWidth = strokeWidth
-            color = strokeColor
-        }
-
-        currentStrokeId = UUID.randomUUID().toString()
-        invalidate()
-    }
-
-    // Convert screen coordinates to actual canvas coordinates (accounting for pan and zoom)
+    // Convert screen coordinates to actual canvas drawing coordinates
     private fun screenToCanvas(screenX: Float, screenY: Float): PointF {
-        val point = floatArrayOf(screenX, screenY)
-        inverseMatrix.mapPoints(point)
-        return PointF(point[0], point[1])
+        // Screen coordinates relative to the canvas view
+        // Need to account for translation and scale
+        val canvasX = (screenX - canvasOffsetX) / canvasScale
+        val canvasY = (screenY - canvasOffsetY) / canvasScale
+        return PointF(canvasX, canvasY)
     }
 
-    // Update transformation matrices
-    private fun updateMatrices() {
-        transformMatrix.reset()
-        transformMatrix.postTranslate(translateX, translateY)
-        transformMatrix.postScale(scaleFactor, scaleFactor)
-        transformMatrix.invert(inverseMatrix)
+    private fun pointsToPath(points: List<Point>): Path {
+        val path = Path()
+        if (points.isNotEmpty()) {
+            path.moveTo(points[0].x, points[0].y)
+            for (i in 1 until points.size) {
+                path.lineTo(points[i].x, points[i].y)
+            }
+        }
+        return path
     }
 
-    private fun drawStrokeToBitmap(stroke: StrokeRepository.Stroke) {
+    private fun drawStrokeToBitmap(stroke: Stroke) {
         canvasBitmap?.let { bitmap ->
             val canvas = Canvas(bitmap)
-            canvas.drawPath(stroke.path, stroke.paint)
+            val path = stroke.toPath()
+            val paint = stroke.toPaint()
+            canvas.drawPath(path, paint)
         }
     }
 
@@ -269,18 +254,19 @@ class DrawingView @JvmOverloads constructor(
         canvasBitmap?.let { bitmap ->
             val canvas = Canvas(bitmap)
             StrokeRepository.getAllStrokes().forEach { stroke ->
-                canvas.drawPath(stroke.path, stroke.paint)
+                val path = stroke.toPath()
+                val paint = stroke.toPaint()
+                canvas.drawPath(path, paint)
             }
         }
         invalidate()
     }
 
-    // Observer callbacks
-    override fun onStrokesChanged(strokes: List<StrokeRepository.Stroke>) {
+    override fun onDrawingChanged(drawing: com.example.zodiaccalculator.data.models.Drawing) {
         redrawAllStrokes()
     }
 
-    override fun onStrokeAdded(stroke: StrokeRepository.Stroke) {}
+    override fun onStrokeAdded(stroke: Stroke) {}
 
     override fun onStrokeRemoved(strokeId: String) {
         redrawAllStrokes()
@@ -290,7 +276,6 @@ class DrawingView @JvmOverloads constructor(
         redrawAllStrokes()
     }
 
-    // Public methods for toolbar
     fun clearCanvas() {
         StrokeRepository.clearAllStrokes()
     }
@@ -308,9 +293,9 @@ class DrawingView @JvmOverloads constructor(
     }
 
     fun resetView() {
-        scaleFactor = 1f
-        translateX = 0f
-        translateY = 0f
+        canvasScale = 1f
+        canvasOffsetX = 0f
+        canvasOffsetY = 0f
         invalidate()
     }
 

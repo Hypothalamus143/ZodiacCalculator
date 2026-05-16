@@ -1,25 +1,16 @@
 package com.example.zodiaccalculator.data.repositories
 
-import android.graphics.Paint
-import android.graphics.Path
+import com.example.zodiaccalculator.data.models.Drawing
+import com.example.zodiaccalculator.data.models.Stroke
 
 object StrokeRepository {
 
-    data class Stroke(
-        val id: String,
-        val path: Path,
-        val paint: Paint,
-        val strokeWidth: Float,
-        val timestamp: Long = System.currentTimeMillis()
-    )
+    private var currentDrawing: Drawing = Drawing()
 
-    private val strokes = mutableListOf<Stroke>()
-
-    // Observers for UI updates
     private val observers = mutableListOf<StrokeObserver>()
 
     interface StrokeObserver {
-        fun onStrokesChanged(strokes: List<Stroke>)
+        fun onDrawingChanged(drawing: Drawing)
         fun onStrokeAdded(stroke: Stroke)
         fun onStrokeRemoved(strokeId: String)
         fun onCanvasCleared()
@@ -35,13 +26,15 @@ object StrokeRepository {
         observers.remove(observer)
     }
 
-    fun getAllStrokes(): List<Stroke> = strokes.toList()
+    fun getCurrentDrawing(): Drawing = currentDrawing
 
-    fun getStrokeCount(): Int = strokes.size
+    fun getAllStrokes(): List<Stroke> = currentDrawing.strokes
+
+    fun getStrokeCount(): Int = currentDrawing.strokes.size
 
     fun addStroke(stroke: Stroke): Boolean {
         return try {
-            strokes.add(stroke)
+            currentDrawing = Drawing(currentDrawing.strokes + stroke)
             notifyStrokeAdded(stroke)
             true
         } catch (e: Exception) {
@@ -50,9 +43,9 @@ object StrokeRepository {
     }
 
     fun removeStroke(strokeId: String): Boolean {
-        val index = strokes.indexOfFirst { it.id == strokeId }
-        return if (index != -1) {
-            strokes.removeAt(index)
+        val strokeExists = currentDrawing.strokes.any { it.id == strokeId }
+        return if (strokeExists) {
+            currentDrawing = Drawing(currentDrawing.strokes.filter { it.id != strokeId })
             notifyStrokeRemoved(strokeId)
             true
         } else {
@@ -61,8 +54,8 @@ object StrokeRepository {
     }
 
     fun removeStrokeAtPoint(x: Float, y: Float, touchRadius: Float = 30f): String? {
-        val strokeToRemove = strokes.find { stroke ->
-            isPointNearPath(x, y, stroke.path, touchRadius)
+        val strokeToRemove = currentDrawing.strokes.find { stroke ->
+            isPointNearStroke(x, y, stroke, touchRadius)
         }
         return strokeToRemove?.let {
             removeStroke(it.id)
@@ -71,27 +64,29 @@ object StrokeRepository {
     }
 
     fun removeStrokesIntersectingLine(x1: Float, y1: Float, x2: Float, y2: Float, radius: Float = 30f): List<String> {
-        val removedIds = mutableListOf<String>()
-        val iterator = strokes.iterator()
-
-        while (iterator.hasNext()) {
-            val stroke = iterator.next()
-            if (isLineIntersectingStroke(x1, y1, x2, y2, stroke.path, radius)) {
-                iterator.remove()
-                removedIds.add(stroke.id)
-                notifyStrokeRemoved(stroke.id)
-            }
+        val strokesToRemove = currentDrawing.strokes.filter { stroke ->
+            isLineIntersectingStroke(x1, y1, x2, y2, stroke, radius)
         }
 
+        val removedIds = strokesToRemove.map { it.id }
+        currentDrawing = Drawing(currentDrawing.strokes.filter { stroke -> !removedIds.contains(stroke.id) })
+
+        removedIds.forEach { notifyStrokeRemoved(it) }
         return removedIds
     }
 
     fun clearAllStrokes() {
-        strokes.clear()
+        currentDrawing = Drawing()
         notifyCanvasCleared()
     }
 
-    private fun isPointNearPath(x: Float, y: Float, path: Path, radius: Float): Boolean {
+    fun loadDrawing(drawing: Drawing) {
+        currentDrawing = drawing
+        notifyDrawingChanged(currentDrawing)
+    }
+
+    private fun isPointNearStroke(x: Float, y: Float, stroke: Stroke, radius: Float): Boolean {
+        val path = stroke.toPath()
         val pathMeasure = android.graphics.PathMeasure(path, false)
         val point = FloatArray(2)
 
@@ -111,31 +106,35 @@ object StrokeRepository {
         return false
     }
 
-    private fun isLineIntersectingStroke(x1: Float, y1: Float, x2: Float, y2: Float, path: Path, radius: Float): Boolean {
+    private fun isLineIntersectingStroke(x1: Float, y1: Float, x2: Float, y2: Float, stroke: Stroke, radius: Float): Boolean {
         val steps = 10
         for (i in 0..steps) {
             val t = i.toFloat() / steps
             val x = x1 + (x2 - x1) * t
             val y = y1 + (y2 - y1) * t
-            if (isPointNearPath(x, y, path, radius)) {
+            if (isPointNearStroke(x, y, stroke, radius)) {
                 return true
             }
         }
         return false
     }
 
+    private fun notifyDrawingChanged(drawing: Drawing) {
+        observers.forEach { it.onDrawingChanged(drawing) }
+    }
+
     private fun notifyStrokeAdded(stroke: Stroke) {
         observers.forEach { it.onStrokeAdded(stroke) }
-        observers.forEach { it.onStrokesChanged(getAllStrokes()) }
+        observers.forEach { it.onDrawingChanged(currentDrawing) }
     }
 
     private fun notifyStrokeRemoved(strokeId: String) {
         observers.forEach { it.onStrokeRemoved(strokeId) }
-        observers.forEach { it.onStrokesChanged(getAllStrokes()) }
+        observers.forEach { it.onDrawingChanged(currentDrawing) }
     }
 
     private fun notifyCanvasCleared() {
         observers.forEach { it.onCanvasCleared() }
-        observers.forEach { it.onStrokesChanged(getAllStrokes()) }
+        observers.forEach { it.onDrawingChanged(currentDrawing) }
     }
 }
