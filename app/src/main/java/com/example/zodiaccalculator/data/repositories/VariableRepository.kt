@@ -1,5 +1,6 @@
 package com.example.zodiaccalculator.data.repositories
 
+import com.example.zodiaccalculator.data.models.Calculation
 import com.example.zodiaccalculator.data.models.Variable
 import com.example.zodiaccalculator.data.utils.ExpressionEvaluator
 
@@ -157,13 +158,22 @@ object VariableRepository {
 
     // ========== INITIAL DEMO DATA ==========
 
-    init {
+    fun loadFromCalculation(calculation: Calculation?) {
+        clearAllVariables()
+        if (calculation != null) {
+            calculation.variables.forEach { variable ->
+                saveVariable(variable.id, variable.name, variable.expression)
+            }
+        } else {
+            // Only create default data if no calculation exists
+            createDefaultVariables()
+        }
+    }
+
+    private fun createDefaultVariables() {
         saveVariable(null, "x", "5")
         saveVariable(null, "y", "3")
-        saveVariable(null, "a", "2")
         saveVariable(null, "sum", "x + y")
-        saveVariable(null, "product", "x * y")
-        saveVariable(null, "quadratic", "sum^2 + product")
     }
     // Add to VariableRepository.kt
 
@@ -206,5 +216,15 @@ object VariableRepository {
         val variable = variables[variableId] ?: return false
         val currentValues = getCurrentVariableValues()
         return evaluator.evaluate(variable.expression, currentValues) != null
+    }
+    fun clearAllVariables() {
+        variables.clear()
+    }
+
+    fun loadVariables(variablesList: List<Variable>) {
+        clearAllVariables()
+        variablesList.forEach { variable ->
+            saveVariable(variable.id, variable.name, variable.expression)
+        }
     }
 }

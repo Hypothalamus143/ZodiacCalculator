@@ -1,9 +1,10 @@
 package com.example.zodiaccalculator.screen.equationdashboard
 
+import com.example.zodiaccalculator.app.ZodiacCalculator
 import com.example.zodiaccalculator.data.models.Variable
-import com.example.zodiaccalculator.data.repositories.VariableRepository  // Changed from EquationRepository
+import com.example.zodiaccalculator.data.repositories.VariableRepository
 
-class EquationDashboardModel {
+class EquationDashboardModel(private val app: ZodiacCalculator) {
 
     fun getVariables(): List<Variable> = VariableRepository.getVariables()
 
@@ -54,9 +55,11 @@ class EquationDashboardModel {
             false
         }
     }
+
     fun getCurrentVariableValues(): Map<String, Double> {
         return VariableRepository.getCurrentVariableValues()
     }
+
     fun getSymbolicExpression(variableId: String): String {
         return VariableRepository.getSymbolicExpression(variableId)
     }
@@ -68,4 +71,34 @@ class EquationDashboardModel {
     fun isFullyEvaluated(variableId: String): Boolean {
         return VariableRepository.isFullyEvaluated(variableId)
     }
+
+    // ========== CALCULATION METHODS ==========
+
+    fun getCurrentCalculationId(): String? {
+        return app.currentCalculationId  // ← Get from CustomApp, not User
+    }
+
+    fun loadCalculationVariables(calculationId: String) {
+        val calculation = app.currentUser?.calculations?.find { it.id == calculationId }
+        VariableRepository.loadFromCalculation(calculation)
+    }
+
+    fun loadCurrentCalculation() {
+        val calculationId = app.currentCalculationId
+        val calculation = app.currentUser?.calculations?.find { it.id == calculationId }
+        VariableRepository.loadFromCalculation(calculation)
+    }
+
+    fun autoSaveCurrentCalculation() {
+        val calculationId = app.currentCalculationId
+        if (calculationId != null) {
+            val variables = getVariables()  // Get current variables
+            val calculation = app.currentUser?.calculations?.find { it.id == calculationId }
+            calculation?.let {
+                it.variables = variables.toList()  // Save a copy
+                it.dateModified = java.time.LocalDateTime.now()
+            }
+        }
+    }
+
 }

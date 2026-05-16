@@ -1,15 +1,16 @@
 package com.example.zodiaccalculator.screen.equationdashboard
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import com.example.zodiaccalculator.R
 import com.example.zodiaccalculator.data.models.Variable
+import com.example.zodiaccalculator.utils.Extensions.app
 
-class EquationDashboardActivity : AppCompatActivity(), EquationDashboardContract.View {
+class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
 
     private lateinit var presenter: EquationDashboardPresenter
     private lateinit var linearLayoutVariables: LinearLayout
@@ -22,11 +23,14 @@ class EquationDashboardActivity : AppCompatActivity(), EquationDashboardContract
         linearLayoutVariables = findViewById(R.id.linearLayoutVariables)
         buttonAddVariable = findViewById(R.id.buttonAddVariable)
 
-        presenter = EquationDashboardPresenter(this, EquationDashboardModel())
+        val app = app()
+        val model = EquationDashboardModel(app)
+        presenter = EquationDashboardPresenter(this, model)
+
+        // Load from current calculation (set by CalculationsListView)
+        presenter.loadCurrentCalculation()
 
         buttonAddVariable.setOnClickListener { presenter.onAddVariableClick() }
-
-        presenter.loadVariables()
     }
 
     override fun displayVariables(variables: List<Variable>) {

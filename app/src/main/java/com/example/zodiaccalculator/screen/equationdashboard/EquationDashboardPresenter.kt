@@ -6,10 +6,25 @@ class EquationDashboardPresenter(
     private val view: EquationDashboardContract.View,
     private val model: EquationDashboardModel
 ) : EquationDashboardContract.Presenter {
+    private var currentCalculationId: String? = null
 
     override fun loadVariables() {
         val variables = model.getVariables()
         view.displayVariables(variables)
+    }
+
+    fun loadCurrentCalculation() {
+        model.loadCurrentCalculation()
+        loadVariables()
+    }
+
+    fun loadCalculation(calculationId: String) {
+        model.loadCalculationVariables(calculationId)
+        loadVariables()
+    }
+
+    private fun autoSave() {
+        model.autoSaveCurrentCalculation()
     }
 
     override fun onAddVariableClick() {
@@ -31,7 +46,6 @@ class EquationDashboardPresenter(
             return
         }
 
-        // Check for duplicate names
         val existingVariable = model.getVariables().find { it.name == name && it.id != id }
         if (existingVariable != null) {
             view.showError("Variable with name '$name' already exists")
@@ -46,6 +60,7 @@ class EquationDashboardPresenter(
 
         if (success) {
             refreshAfterChange()
+            autoSave()  // ← Save after add/edit
             view.showSuccess(if (id == null) "Variable added" else "Variable updated")
         } else {
             view.showError("Failed to save variable")
@@ -56,6 +71,7 @@ class EquationDashboardPresenter(
         try {
             if (model.deleteVariable(variableId)) {
                 refreshAfterChange()
+                autoSave()  // ← Save after delete
                 view.showSuccess("Variable deleted")
             } else {
                 view.showError("Failed to delete variable")
@@ -73,6 +89,7 @@ class EquationDashboardPresenter(
 
         if (model.updateVariableExpression(variableId, newExpression)) {
             refreshAfterChange()
+            autoSave()  // ← Save after expression change
         } else {
             view.showError("Failed to update expression")
         }
@@ -84,7 +101,6 @@ class EquationDashboardPresenter(
             return
         }
 
-        // Check for duplicate names
         val existingVariable = model.getVariables().find { it.name == newName && it.id != variableId }
         if (existingVariable != null) {
             view.showError("Variable with name '$newName' already exists")
@@ -93,6 +109,7 @@ class EquationDashboardPresenter(
 
         if (model.updateVariableName(variableId, newName)) {
             refreshAfterChange()
+            autoSave()  // ← Save after name change
             view.showSuccess("Variable renamed to '$newName'")
         } else {
             view.showError("Failed to rename variable")

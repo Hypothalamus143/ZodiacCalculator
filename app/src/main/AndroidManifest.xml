@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".app.CustomApp"
+        android:name=".app.ZodiacCalculator"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -28,6 +28,9 @@
 <!--        android:name=".screen.splash.SplashActivity"-->
         <activity
             android:name=".screen.equationdashboard.EquationDashboardActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".screen.splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

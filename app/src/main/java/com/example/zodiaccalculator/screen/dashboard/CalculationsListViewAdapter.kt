@@ -1,7 +1,7 @@
 package com.example.zodiaccalculator.screen.dashboard
 
-import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +11,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.example.zodiaccalculator.R
+import com.example.zodiaccalculator.app.ZodiacCalculator
 import com.example.zodiaccalculator.data.models.Calculation
-import com.example.zodiaccalculator.utils.Extensions.toastText
+import com.example.zodiaccalculator.screen.equationdashboard.EquationDashboardActivity
 
 class CalculationsListViewAdapter (private val context: Context, private val calculationsList: MutableList<Calculation>): BaseAdapter() {
     override fun getCount(): Int {
@@ -43,7 +44,11 @@ class CalculationsListViewAdapter (private val context: Context, private val cal
             notifyDataSetChanged()
         }
         view.setOnClickListener {
-            (context as Activity).toastText("Position "+pos+" is clicked")
+            val calculation = calculationsList[pos]
+            val app = (context.applicationContext as ZodiacCalculator)
+            app.currentCalculationId = calculation.id  // ← Store in CustomApp
+            val intent = Intent(context, EquationDashboardActivity::class.java)
+            context.startActivity(intent)
         }
 
         val calculation = calculationsList[pos]
