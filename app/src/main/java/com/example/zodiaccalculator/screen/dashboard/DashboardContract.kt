@@ -8,6 +8,7 @@ class DashboardContract {
         fun setCalculationsListView(calculations: MutableList<Calculation>)
         fun showError(message: String)
         fun notifyChanges()
+        fun logout()
 //        fun navigateToDashboard()
 //        fun setUserDetails(user: User);
 //        fun navigateToLogin();

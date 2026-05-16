@@ -19,5 +19,11 @@ class DashboardPresenter(private val view: DashboardContract.View, private val m
        val calculations = model.getCalculations()
         if(calculations != null) view.setCalculationsListView(calculations)
     }
-
+    // Add this function to your DashboardPresenter class
+    fun onLogoutClicked() {
+        // Clear any user session data if needed
+        // For example: app().clearUserSession()
+        view.logout();
+        // Navigate to LoginActivity
+    }
 }
