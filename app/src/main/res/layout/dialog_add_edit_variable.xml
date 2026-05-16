@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Variable Details"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/dialogVariableName"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Variable Name (e.g., x, y, radius)"
+        android:inputType="text"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Variable Type:"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spinnerDialogVariableType"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Layout for Constant type (shows value input) -->
+    <LinearLayout
+        android:id="@+id/layoutDialogValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Value:"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/dialogVariableValue"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Enter number"
+            android:inputType="numberDecimal"
+            android:padding="16dp" />
+    </LinearLayout>
+
+    <!-- Layout for Computed type (shows expression input) -->
+    <LinearLayout
+        android:id="@+id/layoutDialogExpression"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Expression:"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/dialogVariableExpression"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="e.g., x + y, x^2 + y"
+            android:inputType="text"
+            android:padding="16dp" />
+    </LinearLayout>
+
+</LinearLayout>

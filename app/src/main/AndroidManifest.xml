@@ -25,8 +25,9 @@
         <activity
             android:name=".screen.login.LoginActivity"
             android:exported="false"/>
+<!--        android:name=".screen.splash.SplashActivity"-->
         <activity
-            android:name=".screen.splash.SplashActivity"
+            android:name=".screen.equationdashboard.EquationDashboardActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
