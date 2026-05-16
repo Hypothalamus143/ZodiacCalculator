@@ -11,6 +11,7 @@ class EquationDashboardContract {
         fun showSuccess(message: String)
         fun refreshVariables()
         fun navigateToDashboard()
+        fun setVariableCount(count: String)
     }
 
     interface Presenter {

@@ -11,11 +11,11 @@
     <!-- App Logo / Icon -->
     <ImageView
         android:id="@+id/imageViewLogo"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:src="@drawable/zodiac"
+        android:layout_width="250dp"
+        android:layout_height="125dp"
         android:layout_marginBottom="24dp"
-        android:contentDescription="App Logo" />
+        android:contentDescription="App Logo"
+        android:src="@drawable/zodiac" />
 
     <!-- Welcome / Sign In Title -->
     <TextView

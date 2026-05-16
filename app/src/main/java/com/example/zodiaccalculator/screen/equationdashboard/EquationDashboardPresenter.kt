@@ -6,11 +6,10 @@ class EquationDashboardPresenter(
     private val view: EquationDashboardContract.View,
     private val model: EquationDashboardModel
 ) : EquationDashboardContract.Presenter {
-    private var currentCalculationId: String? = null
-
     override fun loadVariables() {
         val variables = model.getVariables()
         view.displayVariables(variables)
+        updateCounter()
     }
 
     fun loadCurrentCalculation() {
@@ -25,6 +24,8 @@ class EquationDashboardPresenter(
 
     private fun autoSave() {
         model.autoSaveCurrentCalculation()
+        val size = model.getCalculationSize()
+        updateCounter()
     }
 
     override fun onAddVariableClick() {
@@ -137,5 +138,12 @@ class EquationDashboardPresenter(
     }
     override fun logoClicked(){
         view.navigateToDashboard();
+    }
+    fun updateCounter(){
+        val size = model.getCalculationSize()
+        if(size == 1)
+            view.setVariableCount("1 item")
+        else
+            view.setVariableCount(size.toString()+" items")
     }
 }

@@ -107,5 +107,6 @@ class EquationDashboardModel(private val app: ZodiacCalculator) : ViewModel(){
             UserRepository.saveUser(app.currentUser!!);
         }
     }
+    fun getCalculationSize() = VariableRepository.getVariables().size
 
 }

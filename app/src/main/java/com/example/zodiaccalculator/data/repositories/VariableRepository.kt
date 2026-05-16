@@ -175,31 +175,6 @@ object VariableRepository {
         saveVariable(null, "y", "3")
         saveVariable(null, "sum", "x + y")
     }
-    // Add to VariableRepository.kt
-
-    fun getSymbolicValue(variableId: String): String {
-        val variable = variables[variableId] ?: return "?"
-
-        // Get current values of all variables
-        val currentValues = getCurrentVariableValues()
-
-        // Try to evaluate fully first
-        val numericResult = evaluator.evaluate(variable.expression, currentValues)
-
-        return if (numericResult != null) {
-            numericResult.toString()  // Fully evaluable - show number
-        } else {
-            // Get symbolic representation
-            evaluator.getSymbolicExpression(variable.expression, currentValues)
-        }
-    }
-
-    fun hasUndefinedVariables(variableId: String): Boolean {
-        val variable = variables[variableId] ?: return true
-        val definedVariables = variables.values.map { it.name }.toSet()
-        val undefined = evaluator.getUndefinedVariables(variable.expression, definedVariables)
-        return undefined.isNotEmpty()
-    }
     fun getSymbolicExpression(variableId: String): String {
         val variable = variables[variableId] ?: return "?"
         val currentValues = getCurrentVariableValues()
@@ -219,12 +194,5 @@ object VariableRepository {
     }
     fun clearAllVariables() {
         variables.clear()
-    }
-
-    fun loadVariables(variablesList: List<Variable>) {
-        clearAllVariables()
-        variablesList.forEach { variable ->
-            saveVariable(variable.id, variable.name, variable.expression)
-        }
     }
 }

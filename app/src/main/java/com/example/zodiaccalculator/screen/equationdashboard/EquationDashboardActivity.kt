@@ -19,6 +19,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
     private lateinit var linearLayoutVariables: LinearLayout
     private lateinit var buttonAddVariable: FloatingActionButton
     private lateinit var imageHome: ImageView
+    private lateinit var textviewVariableCount: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +28,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
         linearLayoutVariables = findViewById(R.id.linearLayoutVariables)
         buttonAddVariable = findViewById(R.id.buttonAddVariable)
         imageHome = findViewById<ImageView>(R.id.imageViewLogo)
+        textviewVariableCount = findViewById<TextView>(R.id.textviewVariableCount)
         val app = app()
         val model = EquationDashboardModel(app)
         presenter = EquationDashboardPresenter(this, model)
@@ -162,5 +164,8 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
 
     override fun refreshVariables() {
         presenter.loadVariables()
+    }
+    override fun setVariableCount(count: String){
+        textviewVariableCount.text = count
     }
 }
