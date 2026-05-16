@@ -1,0 +1,14 @@
+package com.example.zodiaccalculator.screen.drawing
+
+class DrawingContract {
+    interface View {
+        fun clearDrawing()
+        fun navigateBack()
+        fun showError(message: String)
+        fun showSuccess(message: String)
+    }
+
+    interface Presenter {
+        fun onBackClick()
+    }
+}

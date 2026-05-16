@@ -30,7 +30,7 @@
             android:name=".screen.equationdashboard.EquationDashboardActivity"
             android:exported="false"/>
         <activity
-            android:name=".screen.splash.SplashActivity"
+            android:name=".screen.drawing.DrawingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
