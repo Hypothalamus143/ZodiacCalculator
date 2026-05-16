@@ -1,0 +1,158 @@
+package com.example.zodiaccalculator.data.repositories
+
+import com.example.zodiaccalculator.data.models.Variable
+import com.example.zodiaccalculator.data.utils.ExpressionEvaluator
+
+object VariableRepository {
+    private val variables = mutableMapOf<String, Variable>()
+    private val evaluator = ExpressionEvaluator()
+    private var isEvaluating = false
+
+    // ========== BASIC GETTERS ==========
+
+    fun getVariables(): List<Variable> = variables.values.toList()
+
+    fun getVariable(id: String): Variable? = variables[id]
+
+    // ========== SAVE / UPDATE ==========
+
+    fun saveVariable(id: String?, name: String, expression: String): Variable {
+        val existingId = id ?: java.util.UUID.randomUUID().toString()
+        val variable = Variable(existingId, name, expression)
+        variables[existingId] = variable
+        evaluateVariableSafely(existingId)
+        propagateUpdates(existingId)
+        return variable
+    }
+
+    fun updateVariableExpression(id: String, newExpression: String): Boolean {
+        val variable = variables[id]
+        return if (variable != null) {
+            variable.expression = newExpression
+            evaluateVariableSafely(id)
+            propagateUpdates(id)
+            true
+        } else {
+            false
+        }
+    }
+
+    fun updateVariableName(id: String, newName: String): Boolean {
+        val variable = variables[id]
+        return if (variable != null) {
+            variable.name = newName
+            true
+        } else {
+            false
+        }
+    }
+
+    // ========== DELETE ==========
+
+    fun deleteVariable(id: String): Boolean {
+        // Check if other variables depend on this one
+        val dependents = findDependents(id)
+        if (dependents.isNotEmpty()) {
+            throw IllegalStateException("Cannot delete '${variables[id]?.name}': ${dependents.size} other variable(s) depend on it")
+        }
+        return variables.remove(id) != null
+    }
+
+    // ========== EVALUATION ==========
+
+    private fun evaluateVariableSafely(variableId: String) {
+        if (isEvaluating) return
+
+        isEvaluating = true
+        try {
+            val variable = variables[variableId]
+            if (variable != null) {
+                val variableMap = buildVariableMap()
+                val result = evaluator.evaluate(variable.expression, variableMap)
+
+                if (result != null) {
+                    variable.value = result
+                    variable.isValid = true
+                } else {
+                    variable.value = null
+                    variable.isValid = false
+                }
+            }
+        } finally {
+            isEvaluating = false
+        }
+    }
+
+    private fun buildVariableMap(): Map<String, Double> {
+        return variables.values.associate { it.name to (it.value ?: 0.0) }
+    }
+
+    private fun propagateUpdates(changedVariableId: String) {
+        val dependents = findDependents(changedVariableId)
+        dependents.forEach { dependentId ->
+            evaluateVariableSafely(dependentId)
+        }
+    }
+
+    private fun findDependents(variableId: String): List<String> {
+        val variable = variables[variableId] ?: return emptyList()
+        val dependents = mutableListOf<String>()
+
+        variables.values.forEach { candidate ->
+            if (candidate.id != variableId && candidate.expression.contains(variable.name)) {
+                dependents.add(candidate.id)
+            }
+        }
+
+        return dependents
+    }
+
+    fun getCurrentVariableValues(): Map<String, Double> {
+        val sortedVariables = topologicalSort()
+        sortedVariables.forEach { variableId ->
+            evaluateVariableSafely(variableId)
+        }
+
+        return variables.values.associate { it.name to (it.value ?: 0.0) }
+    }
+
+    private fun topologicalSort(): List<String> {
+        val result = mutableListOf<String>()
+        val visited = mutableSetOf<String>()
+        val temp = mutableSetOf<String>()
+
+        fun visit(variableId: String) {
+            if (temp.contains(variableId)) return
+            if (visited.contains(variableId)) return
+
+            temp.add(variableId)
+
+            val variable = variables[variableId]
+            if (variable != null) {
+                variables.values.forEach { other ->
+                    if (other.id != variableId && variable.expression.contains(other.name)) {
+                        visit(other.id)
+                    }
+                }
+            }
+
+            temp.remove(variableId)
+            visited.add(variableId)
+            result.add(variableId)
+        }
+
+        variables.keys.forEach { visit(it) }
+        return result
+    }
+
+    // ========== INITIAL DEMO DATA ==========
+
+    init {
+        saveVariable(null, "x", "5")
+        saveVariable(null, "y", "3")
+        saveVariable(null, "a", "2")
+        saveVariable(null, "sum", "x + y")
+        saveVariable(null, "product", "x * y")
+        saveVariable(null, "quadratic", "sum^2 + product")
+    }
+}

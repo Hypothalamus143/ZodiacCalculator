@@ -29,15 +29,15 @@
                 android:textColor="#333333" />
 
             <Button
-                android:id="@+id/buttonAddEquation"
+                android:id="@+id/buttonAddVariable"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="+ Add Equation"
+                android:text="+ Add Variable"
                 android:paddingHorizontal="16dp"
                 android:minWidth="120dp" />
         </LinearLayout>
 
-        <!-- Variables Section -->
+        <!-- All Variables (no separate equations section) -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,37 +47,11 @@
             android:textColor="#333333"
             android:layout_marginBottom="12dp" />
 
-        <androidx.cardview.widget.CardView
+        <LinearLayout
+            android:id="@+id/linearLayoutVariables"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:id="@+id/linearLayoutVariables"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp" />
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Equations Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Equations"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333"
-            android:layout_marginBottom="12dp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewEquations"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:orientation="vertical" />
 
     </LinearLayout>
 </ScrollView>
