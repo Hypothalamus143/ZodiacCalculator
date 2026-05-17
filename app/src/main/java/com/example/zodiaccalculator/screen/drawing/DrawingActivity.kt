@@ -4,10 +4,12 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.example.zodiaccalculator.R
 import com.example.zodiaccalculator.data.models.Stroke
 import com.example.zodiaccalculator.utils.Extensions.app
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class DrawingActivity : Activity(), DrawingContract.View {
 
@@ -17,8 +19,9 @@ class DrawingActivity : Activity(), DrawingContract.View {
     private lateinit var buttonEraser: Button
     private lateinit var buttonHand: Button
     private lateinit var buttonClear: Button
-    private lateinit var buttonResetView: Button
+    private lateinit var buttonResetView: FloatingActionButton
     private lateinit var buttonBack: ImageView
+    private lateinit var textViewToolMode: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +34,7 @@ class DrawingActivity : Activity(), DrawingContract.View {
         buttonClear = findViewById(R.id.buttonClear)
         buttonResetView = findViewById(R.id.buttonResetView)
         buttonBack = findViewById(R.id.buttonBack)
+        textViewToolMode = findViewById(R.id.textViewToolMode)
 
         val app = app()
         val model = DrawingModel(app)
@@ -56,17 +60,17 @@ class DrawingActivity : Activity(), DrawingContract.View {
     private fun setupClickListeners() {
         buttonPen.setOnClickListener {
             drawingView.setPenMode()
-            showSuccess("Pen mode")
+            textViewToolMode.text="Pen"
         }
 
         buttonEraser.setOnClickListener {
             drawingView.setEraserMode()
-            showSuccess("Eraser mode - tap/drag on strokes to delete")
+            textViewToolMode.text="Eraser"
         }
 
         buttonHand.setOnClickListener {
             drawingView.setHandMode()
-            showSuccess("Hand mode - drag to pan, pinch to zoom")
+            textViewToolMode.text="Pan"
         }
 
         buttonClear.setOnClickListener {
@@ -97,9 +101,5 @@ class DrawingActivity : Activity(), DrawingContract.View {
 
     override fun showSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onBackPressed() {
-        presenter.onBackClick()
     }
 }
