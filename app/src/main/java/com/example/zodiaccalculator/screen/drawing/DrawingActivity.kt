@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.zodiaccalculator.R
+import com.example.zodiaccalculator.data.models.Stroke
 import com.example.zodiaccalculator.utils.Extensions.app
 
 class DrawingActivity : Activity(), DrawingContract.View {
@@ -35,7 +36,21 @@ class DrawingActivity : Activity(), DrawingContract.View {
         val model = DrawingModel(app)
         presenter = DrawingPresenter(this, model)
 
+        // Load current calculation's drawing (same pattern as EquationDashboardActivity)
+        presenter.loadCurrentCalculation()
+
         setupClickListeners()
+
+        // Set up drawing view callback to notify presenter of changes
+        drawingView.setOnStrokeListener(object : DrawingView.OnStrokeListener {
+            override fun onStrokeAdded(stroke: Stroke) {
+                presenter.onStrokeAdded(stroke)
+            }
+
+            override fun onStrokeRemoved(strokeId: String) {
+                presenter.onStrokeRemoved(strokeId)
+            }
+        })
     }
 
     private fun setupClickListeners() {
@@ -55,8 +70,7 @@ class DrawingActivity : Activity(), DrawingContract.View {
         }
 
         buttonClear.setOnClickListener {
-            drawingView.clearCanvas()
-            showSuccess("Canvas cleared")
+            presenter.onClearClick()
         }
 
         buttonResetView.setOnClickListener {
@@ -83,5 +97,9 @@ class DrawingActivity : Activity(), DrawingContract.View {
 
     override fun showSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onBackPressed() {
+        presenter.onBackClick()
     }
 }

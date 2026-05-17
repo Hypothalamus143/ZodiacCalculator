@@ -17,6 +17,17 @@ class DrawingView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), StrokeRepository.StrokeObserver {
 
+    interface OnStrokeListener {
+        fun onStrokeAdded(stroke: Stroke)
+        fun onStrokeRemoved(strokeId: String)
+    }
+
+    private var strokeListener: OnStrokeListener? = null
+
+    fun setOnStrokeListener(listener: OnStrokeListener) {
+        this.strokeListener = listener
+    }
+
     private var currentPoints = mutableListOf<Point>()
     private val strokeColor = Color.BLACK
     private val strokeWidth = 20f
@@ -29,19 +40,16 @@ class DrawingView @JvmOverloads constructor(
     private var canvasBitmap: Bitmap? = null
     private var canvasPaint: Paint? = null
 
-    // Track the drawing offset and scale separately from view transform
     private var canvasOffsetX = 0f
     private var canvasOffsetY = 0f
     private var canvasScale = 1f
 
-    // Touch handling for pan
     private var lastTouchX = 0f
     private var lastTouchY = 0f
     private var activePointerId = -1
 
     private lateinit var scaleGestureDetector: ScaleGestureDetector
 
-    // For continuous erasing
     private var lastEraseX = 0f
     private var lastEraseY = 0f
     private var isErasing = false
@@ -69,7 +77,6 @@ class DrawingView @JvmOverloads constructor(
     private fun setupGestures() {
         scaleGestureDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
-                // Scale relative to the gesture focal point
                 val prevScale = canvasScale
                 val newScale = (canvasScale * detector.scaleFactor).coerceIn(0.5f, 3f)
 
@@ -77,7 +84,6 @@ class DrawingView @JvmOverloads constructor(
                     val focalX = detector.focusX
                     val focalY = detector.focusY
 
-                    // Adjust offset to keep focal point stationary
                     canvasOffsetX = (canvasOffsetX - focalX) * (newScale / prevScale) + focalX
                     canvasOffsetY = (canvasOffsetY - focalY) * (newScale / prevScale) + focalY
                     canvasScale = newScale
@@ -104,16 +110,13 @@ class DrawingView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         canvas.save()
-        // Apply the canvas transformation for viewing
         canvas.translate(canvasOffsetX, canvasOffsetY)
         canvas.scale(canvasScale, canvasScale)
 
-        // Draw the bitmap (which is at 1:1 scale with canvas coordinates)
         canvasBitmap?.let { bitmap ->
             canvas.drawBitmap(bitmap, 0f, 0f, canvasPaint)
         }
 
-        // Draw current stroke
         if (currentPoints.size > 1 && currentTool == Tool.PEN) {
             val path = pointsToPath(currentPoints)
             canvas.drawPath(path, tempPaint)
@@ -125,7 +128,6 @@ class DrawingView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         scaleGestureDetector.onTouchEvent(event)
 
-        // Convert screen coordinates to canvas coordinates
         val canvasPoint = screenToCanvas(event.x, event.y)
 
         when (currentTool) {
@@ -158,6 +160,7 @@ class DrawingView @JvmOverloads constructor(
                         points = currentPoints.toList()
                     )
                     StrokeRepository.addStroke(stroke)
+                    strokeListener?.onStrokeAdded(stroke)
                     drawStrokeToBitmap(stroke)
                 }
                 currentPoints.clear()
@@ -177,9 +180,10 @@ class DrawingView @JvmOverloads constructor(
 
             MotionEvent.ACTION_MOVE -> {
                 if (isErasing) {
-                    StrokeRepository.removeStrokesIntersectingLine(
+                    val removedIds = StrokeRepository.removeStrokesIntersectingLine(
                         lastEraseX, lastEraseY, canvasPoint.x, canvasPoint.y
                     )
+                    removedIds.forEach { strokeListener?.onStrokeRemoved(it) }
                     lastEraseX = canvasPoint.x
                     lastEraseY = canvasPoint.y
                 }
@@ -220,10 +224,7 @@ class DrawingView @JvmOverloads constructor(
         }
     }
 
-    // Convert screen coordinates to actual canvas drawing coordinates
     private fun screenToCanvas(screenX: Float, screenY: Float): PointF {
-        // Screen coordinates relative to the canvas view
-        // Need to account for translation and scale
         val canvasX = (screenX - canvasOffsetX) / canvasScale
         val canvasY = (screenY - canvasOffsetY) / canvasScale
         return PointF(canvasX, canvasY)
@@ -278,6 +279,9 @@ class DrawingView @JvmOverloads constructor(
 
     fun clearCanvas() {
         StrokeRepository.clearAllStrokes()
+        StrokeRepository.getAllStrokes().forEach { stroke ->
+            strokeListener?.onStrokeRemoved(stroke.id)
+        }
     }
 
     fun setPenMode() {

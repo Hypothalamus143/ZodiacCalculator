@@ -10,6 +10,7 @@ import android.widget.*
 import com.example.zodiaccalculator.R
 import com.example.zodiaccalculator.data.models.Variable
 import com.example.zodiaccalculator.screen.dashboard.DashboardActivity
+import com.example.zodiaccalculator.screen.drawing.DrawingActivity
 import com.example.zodiaccalculator.utils.Extensions.app
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -20,6 +21,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
     private lateinit var buttonAddVariable: FloatingActionButton
     private lateinit var imageHome: ImageView
     private lateinit var textviewVariableCount: TextView
+    private lateinit var buttonDraw : FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
         buttonAddVariable = findViewById(R.id.buttonAddVariable)
         imageHome = findViewById<ImageView>(R.id.imageViewLogo)
         textviewVariableCount = findViewById<TextView>(R.id.textviewVariableCount)
+        buttonDraw = findViewById<FloatingActionButton>(R.id.buttonDraw)
         val app = app()
         val model = EquationDashboardModel(app)
         presenter = EquationDashboardPresenter(this, model)
@@ -38,6 +41,7 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
 
         buttonAddVariable.setOnClickListener { presenter.onAddVariableClick() }
         imageHome.setOnClickListener { presenter.logoClicked() }
+        buttonDraw.setOnClickListener { presenter.onDrawButtonClick() }
     }
 
     override fun displayVariables(variables: List<Variable>) {
@@ -55,6 +59,12 @@ class EquationDashboardActivity : Activity(), EquationDashboardContract.View {
         startActivity(intent)
         finish()
     }
+
+    override fun navigateToDrawing() {
+        val intent = Intent(this, DrawingActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun createVariableView(variable: Variable): View {
         val variableView = layoutInflater.inflate(R.layout.item_variable, null)
 

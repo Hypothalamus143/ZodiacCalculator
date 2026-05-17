@@ -9,6 +9,9 @@ class DrawingContract {
     }
 
     interface Presenter {
+        fun onClearClick()
         fun onBackClick()
+        fun onStrokeAdded(stroke: com.example.zodiaccalculator.data.models.Stroke)
+        fun onStrokeRemoved(strokeId: String)
     }
 }

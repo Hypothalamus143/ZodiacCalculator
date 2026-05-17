@@ -65,7 +65,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Header with Add Button -->
+            <!-- Header with Add Button and Draw Button -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -91,6 +91,19 @@
                     android:textColor="@color/gray_500"
                     android:layout_marginEnd="16dp" />
 
+                <!-- Draw Button -->
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/buttonDraw"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_draw"
+                    android:backgroundTint="#2196F3"
+                    app:tint="@color/white"
+                    app:elevation="0dp"
+                    app:borderWidth="0dp"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Add Variable Button -->
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/buttonAddVariable"
                     android:layout_width="48dp"

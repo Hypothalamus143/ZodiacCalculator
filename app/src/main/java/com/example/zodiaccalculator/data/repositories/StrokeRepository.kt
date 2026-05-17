@@ -1,5 +1,6 @@
 package com.example.zodiaccalculator.data.repositories
 
+import com.example.zodiaccalculator.data.models.Calculation
 import com.example.zodiaccalculator.data.models.Drawing
 import com.example.zodiaccalculator.data.models.Stroke
 
@@ -80,8 +81,13 @@ object StrokeRepository {
         notifyCanvasCleared()
     }
 
-    fun loadDrawing(drawing: Drawing) {
-        currentDrawing = drawing
+    // Load drawing from a Calculation object (similar to VariableRepository.loadFromCalculation)
+    fun loadFromCalculation(calculation: Calculation?) {
+        if (calculation != null) {
+            currentDrawing = calculation.drawing
+        } else {
+            currentDrawing = Drawing()  // Empty drawing with 0 strokes
+        }
         notifyDrawingChanged(currentDrawing)
     }
 

@@ -31,6 +31,9 @@
             android:exported="false"/>
         <activity
             android:name=".screen.drawing.DrawingActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".screen.splash.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

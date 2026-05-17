@@ -6,6 +6,7 @@ class EquationDashboardPresenter(
     private val view: EquationDashboardContract.View,
     private val model: EquationDashboardModel
 ) : EquationDashboardContract.Presenter {
+
     override fun loadVariables() {
         val variables = model.getVariables()
         view.displayVariables(variables)
@@ -36,6 +37,12 @@ class EquationDashboardPresenter(
         view.showEditVariableDialog(variable)
     }
 
+    override fun onDrawButtonClick() {
+        // Auto-save before navigating to drawing
+        autoSave()
+        view.navigateToDrawing()
+    }
+
     override fun onVariableSaved(id: String?, name: String, expression: String) {
         if (name.isBlank()) {
             view.showError("Variable name cannot be empty")
@@ -61,7 +68,7 @@ class EquationDashboardPresenter(
 
         if (success) {
             refreshAfterChange()
-            autoSave()  // ← Save after add/edit
+            autoSave()
             view.showSuccess(if (id == null) "Variable added" else "Variable updated")
         } else {
             view.showError("Failed to save variable")
@@ -72,7 +79,7 @@ class EquationDashboardPresenter(
         try {
             if (model.deleteVariable(variableId)) {
                 refreshAfterChange()
-                autoSave()  // ← Save after delete
+                autoSave()
                 view.showSuccess("Variable deleted")
             } else {
                 view.showError("Failed to delete variable")
@@ -90,7 +97,7 @@ class EquationDashboardPresenter(
 
         if (model.updateVariableExpression(variableId, newExpression)) {
             refreshAfterChange()
-            autoSave()  // ← Save after expression change
+            autoSave()
         } else {
             view.showError("Failed to update expression")
         }
@@ -110,7 +117,7 @@ class EquationDashboardPresenter(
 
         if (model.updateVariableName(variableId, newName)) {
             refreshAfterChange()
-            autoSave()  // ← Save after name change
+            autoSave()
             view.showSuccess("Variable renamed to '$newName'")
         } else {
             view.showError("Failed to rename variable")
@@ -122,9 +129,11 @@ class EquationDashboardPresenter(
         view.displayVariables(variables)
         view.refreshVariables()
     }
+
     override fun getCurrentVariableValues(): Map<String, Double> {
         return model.getCurrentVariableValues()
     }
+
     fun getSymbolicExpression(variableId: String): String {
         return model.getSymbolicExpression(variableId)
     }
@@ -136,9 +145,11 @@ class EquationDashboardPresenter(
     fun isFullyEvaluated(variableId: String): Boolean {
         return model.isFullyEvaluated(variableId)
     }
+
     override fun logoClicked(){
-        view.navigateToDashboard();
+        view.navigateToDashboard()
     }
+
     fun updateCounter(){
         val size = model.getCalculationSize()
         if(size == 1)
